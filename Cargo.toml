@@ -1,0 +1,15 @@
+[package]
+name = "pvc-migrator"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.104"
+clap = { version = "4.6.7", features = ["derive"] }
+futures = "0.3.34"
+indicatif = "0.18.6"
+k8s-openapi = { version = "=0.26.1", features = ["v1_33"] }
+kube = { version = "2.0.1", features = ["client", "runtime", "ws"] }
+tokio = { version = "1.53.1", features = ["full"] }
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }

@@ -1,0 +1,49 @@
+# Minimal Redis with a PVC — used on both KIND clusters (source and dest) to
+# test pvc-migrator. `replicas` starts at 0 on the dest cluster: the PVC is
+# created by the apply, but nothing mounts it until the restore is done
+# (mirrors the real scenario: an app deployed with replicaCount 0 until its
+# data migration is finished).
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-data
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: redis}
+  template:
+    metadata:
+      labels: {app: redis}
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          args: ["--appendonly", "yes"]
+          ports:
+            - containerPort: 6379
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: redis-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+spec:
+  selector: {app: redis}
+  ports:
+    - port: 6379

@@ -1,0 +1,19 @@
+[tasks.build]
+description = "Build the release binary"
+run = "cargo build --release"
+
+[tasks.install]
+description = "Build and install pvc-migrator into ~/.cargo/bin (already on PATH for any Rust toolchain)"
+run = "cargo install --path . --force"
+
+[tasks.test]
+description = "Run the test suite"
+run = "cargo test"
+
+[tasks.fmt]
+description = "Format the code"
+run = "cargo fmt"
+
+[tasks.clean]
+description = "Remove build artifacts"
+run = "cargo clean"
