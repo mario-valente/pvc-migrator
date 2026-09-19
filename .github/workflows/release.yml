@@ -1,0 +1,38 @@
+name: release
+
+# Builds a static (musl) x86_64 Linux binary and attaches it to a GitHub
+# Release whenever a `v*` tag is pushed — that's what install.sh downloads.
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install musl target + tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y musl-tools
+          rustup target add x86_64-unknown-linux-musl
+
+      - name: Build
+        run: cargo build --release --target x86_64-unknown-linux-musl
+
+      - name: Package
+        run: |
+          set -eu
+          out=pvc-migrator-x86_64-unknown-linux-musl.tar.gz
+          tar -C target/x86_64-unknown-linux-musl/release -czf "$out" pvc-migrator
+          echo "ASSET=$out" >> "$GITHUB_ENV"
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.ASSET }}

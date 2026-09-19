@@ -6,6 +6,19 @@ stateful app's data from one cluster to another (e.g. migrating off a
 legacy cluster into a new one) without needing network connectivity between
 the two clusters.
 
+## Install
+
+Prebuilt static binary (Linux/x86_64, no glibc dependency — safe to drop on
+any VM):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/mario-valente/pvc-migrator/master/install.sh | bash
+```
+
+Installs to `~/.local/bin` by default (no sudo needed); set `INSTALL_DIR` to
+override, e.g. `INSTALL_DIR=/usr/local/bin curl ... | bash`. Any other
+platform: build from source, see [Building / installing](#building--installing) below.
+
 ## How it works
 
 No `kubectl` dependency, no direct cluster-to-cluster networking required.
