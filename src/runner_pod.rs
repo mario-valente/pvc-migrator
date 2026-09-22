@@ -55,7 +55,14 @@ impl RunnerPod {
             spec: Some(PodSpec {
                 restart_policy: Some("Never".to_string()),
                 security_context: Some(PodSecurityContext {
-                    run_as_non_root: Some(true),
+                    // Some PVCs are genuinely owned by root (legacy apps that
+                    // never dropped privileges — e.g. the official NocoBase
+                    // image). Forcing runAsNonRoot: true here would make
+                    // Kubernetes reject the pod outright whenever --uid 0 is
+                    // passed on purpose. Only claim non-root when uid != 0;
+                    // a namespace that actually enforces `restricted` PSA
+                    // will still (correctly) refuse a uid-0 pod on its own.
+                    run_as_non_root: Some(uid != 0),
                     run_as_user: Some(uid),
                     run_as_group: Some(gid),
                     fs_group: Some(gid),
@@ -72,7 +79,7 @@ impl RunnerPod {
                     security_context: Some(SecurityContext {
                         allow_privilege_escalation: Some(false),
                         read_only_root_filesystem: Some(true),
-                        run_as_non_root: Some(true),
+                        run_as_non_root: Some(uid != 0),
                         capabilities: Some(Capabilities {
                             drop: Some(vec!["ALL".to_string()]),
                             ..Default::default()

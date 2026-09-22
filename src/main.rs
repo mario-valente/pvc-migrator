@@ -37,7 +37,10 @@ enum Command {
         /// uid/gid the pod that mounts the PVC runs as (also set as
         /// fsGroup, to read files owned by anyone). Match it to the real
         /// owner of the data — e.g. 999 for official Redis, 1000 for Rails
-        /// apps with `USER rails`.
+        /// apps with `USER rails`, 0 for images that still run as root
+        /// (e.g. NocoBase's official image). uid 0 drops the non-root
+        /// requirement on the runner pod itself; it still won't get past a
+        /// namespace that enforces `restricted` Pod Security.
         #[arg(long, default_value_t = 1000)]
         uid: i64,
         #[arg(long, default_value_t = 1000)]
